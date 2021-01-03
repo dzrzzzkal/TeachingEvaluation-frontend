@@ -27,11 +27,10 @@ export function request(config) {
     let token = localStorage.getItem('token')
     if(token) {
       config.headers.common.Authorization = 'Bearer ' + token
-      console.log('现有token:' + token)
+      // console.log('现有token:' + token)
     }
     if(config.method === 'post') {
       config.data = qs.stringify(config.data)
-      // console.log('test:' + config.data)
     }
     // console.log('request interceptor:')
     // console.log(config)
@@ -54,9 +53,8 @@ export function request(config) {
       // store.commit('SET_TOKEN', {tokenCode: tokenCode, token: token})
       localStorage.setItem('token', token)
       localStorage.setItem('tokenCode', tokenCode)
-      console.log('新token' + token)
+      // console.log('新token' + token)
     }
-    // console.log('res.data.tokenCode: '+ res.data.tokenCode)
     return res.data   // 直接返回res.data而不是res，方便后续直接调用
   }, err => {
     console.log('err:' + err)

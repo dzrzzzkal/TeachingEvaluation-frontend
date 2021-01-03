@@ -9,12 +9,13 @@ export default {
   created() {
     request({
       url: '/test',
-        method: 'post',
-        // data: {
-        //   token: localStorage.getItem('token')
-        // },
+      method: 'post',
+      // data: {
+      //   token: localStorage.getItem('token')
+      // },
     }).then(res => {
-      // console.log(res)
+      console.log('about-result:')
+      console.log(res)
     })
   }
 }

@@ -69,15 +69,16 @@ router.beforeEach((to, from, next) => {
       console.log('请先登录')
       next({path: '/login'})
     } else {  // 有token才发送请求，检查token是过期还是可用
+      // 这里重复了吧，前端每次都要对后端进行一次请求，判断token是否过期，而后端每次都会拦截，判断token是否过期，相当于前后台都判断了
       request({   //应该可以将url封装成API.getUserinfo之类的？
-        url: '/test',
-        method: 'get',
+        url: '/checkToken', // 其实就是checkToken()
+        method: 'post',
       }).then(res => {
         // ↓有token的情况下，肯定有user，因为登录时是set了token和user的，所以这里只做status的更新
         // 下面可以根据status或者tokenCode==200(成功)/20001(过期)进行判断
         // 这里暂时还是用tokenCode，因为暂时不确定后端要不要有status这个东西
         // 其实这里也不确定这个tokenCode，它的作用，还有数值如何定
-        // 如果返回的数据中无status会报错
+        console.log('res.status:' + res.status)
         store.commit('SET_USERINFO', {user: store.state.user, status: res.status})
         let tokenCode = res.tokenCode
         if(tokenCode == 200) { // tokenCode == 200 解析成功，用户处于登录状态
