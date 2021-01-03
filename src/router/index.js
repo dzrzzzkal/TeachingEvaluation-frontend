@@ -77,6 +77,7 @@ router.beforeEach((to, from, next) => {
         // 下面可以根据status或者tokenCode==200(成功)/20001(过期)进行判断
         // 这里暂时还是用tokenCode，因为暂时不确定后端要不要有status这个东西
         // 其实这里也不确定这个tokenCode，它的作用，还有数值如何定
+        // 如果返回的数据中无status会报错
         store.commit('SET_USERINFO', {user: store.state.user, status: res.status})
         let tokenCode = res.tokenCode
         if(tokenCode == 200) { // tokenCode == 200 解析成功，用户处于登录状态
