@@ -29,7 +29,7 @@ export default {
 
     submit() {
       return request({
-        url: '/dologin',
+        url: '/doLogin',
         method: 'post',
         // data: JSON.stringify({
         //   user: this.user,

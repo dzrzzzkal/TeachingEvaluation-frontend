@@ -39,6 +39,22 @@ const routes = [
       auth: true
     },
     component: () => import(/* webpackChunkName: "logout" */ '../views/Logout.vue')
+  },
+  {
+    path: '/course',
+    name: 'Course',
+    meta: {
+      auth: true
+    },
+    component: () => import(/* webpackChunkName: "course" */ '../views/Course.vue')
+  },
+  {
+    path: '/class',
+    name: 'Class',
+    meta: {
+      auth: true
+    },
+    component: () => import(/* webpackChunkName: "class" */ '../views/Class.vue')
   }
 ]
 

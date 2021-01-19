@@ -4,7 +4,9 @@
     <router-link to="/about">About</router-link> |
     <router-link to="/register">Register</router-link> |
     <router-link to="/login">Login</router-link> |
-    <router-link to="/logout">Logout</router-link>
+    <router-link to="/logout">Logout</router-link> |
+    <router-link to="/course">Course</router-link> |
+    <router-link to="/class">Class</router-link>
     <!-- <router-link>Login</router-link> -->
   </div>
   <router-view/>

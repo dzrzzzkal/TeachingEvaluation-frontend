@@ -46,8 +46,9 @@ export function request(config) {
         msg: '数据返回不合理'
       }
     }
-    let { token, tokenCode } = res.data
+    console.log('res.data: ')
     console.log(res.data)
+    let { token, tokenCode } = res.data
     // 如果响应返回的数据中有（新的）token，则存入vuex，并更新localStorage
     if(token) { // 考虑要不要改成识别tokenCode或者code
       // store.commit('SET_TOKEN', {tokenCode: tokenCode, token: token})
