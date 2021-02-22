@@ -45,6 +45,14 @@
         :value="item.value">
       </el-option>
     </el-select>
+    <el-select v-model="deansoffice" filterable placeholder="deansoffice">
+      <el-option
+        v-for="item in deansofficeOptions"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value">
+      </el-option>
+    </el-select>
    <br>
     <el-button @click="submit" type="primary">提交</el-button>
   </div>
@@ -67,6 +75,7 @@ export default defineComponent({
       dept: ref(''),   // 系
       role: ref(''),   // 听课角色
       dean: ref(''),   // 是否为系主任
+      deansoffice: ref(''),   // 是什么教务管理人员（非教务管理人员、教务处、学院、系）
     }
   },
   data() {
@@ -141,8 +150,20 @@ export default defineComponent({
           label: '督导'
         },
         {
-          value: '领导',
-          label: '领导'
+          value: '主管教学校领导',
+          label: '主管教学校领导'
+        },
+        {
+          value: '教务处领导',
+          label: '教务处领导'
+        },
+        {
+          value: '其他校领导',
+          label: '其他校领导'
+        },
+        {
+          value: '各学院领导',
+          label: '各学院领导'
         },
       ],
       deanOptions: [
@@ -153,6 +174,24 @@ export default defineComponent({
         {
           value: 'false',
           label: '不是系主任'
+        },
+      ],
+      deansofficeOptions: [
+        {
+          value: 'false',
+          label: '非教务管理人员'
+        },
+        {
+          value: '教务处',
+          label: '教务处'
+        },
+        {
+          value: '学院',
+          label: '学院'
+        },
+        {
+          value: '系',
+          label: '系'
         },
       ],
 
@@ -168,6 +207,7 @@ export default defineComponent({
       // dept: '',   // 系
       // role: '',   // 听课角色
       // dean: '',   // 是否为系主任
+      // deansoffice: '', // 是什么教务管理人员（非教务管理人员、教务处、学院、系）
     } 
   },
 
@@ -186,6 +226,7 @@ export default defineComponent({
           dept: this.dept,
           role: this.role,
           dean: this.dean,
+          deansoffice: this.deansoffice,
         },
         headers: {
           // 'Content-Type': 'application/json'

@@ -26,7 +26,8 @@ export function request(config) {
      */
     let token = localStorage.getItem('token')
     if(token) {
-      config.headers.common.Authorization = 'Bearer ' + token
+      // config.headers.common.Authorization = 'Bearer ' + token
+      config.headers.Authorization = 'Bearer ' + token
       // console.log('现有token:' + token)
     }
     if(config.method === 'post') {

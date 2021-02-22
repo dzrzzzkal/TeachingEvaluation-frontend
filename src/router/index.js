@@ -55,6 +55,14 @@ const routes = [
       auth: true
     },
     component: () => import(/* webpackChunkName: "class" */ '../views/Class.vue')
+  },
+  {
+    path: '/evaluationSheet',
+    name: 'EvaluationSheet',
+    meta: {
+      auth: true
+    },
+    component: () => import(/* webpackChunkName: evaluationSheet" */ '../views/EvaluationSheet.vue')
   }
 ]
 
