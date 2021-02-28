@@ -1,6 +1,7 @@
 <template>
   <div style="padding:30px;">
     <div>查看evaluation sheet</div>
+    <div>evaluationSheetid：{{evaluationSheetid}}</div>
     <input type="text" v-model="evaluationSheetid" placeholder="evaluation sheet id">
     <br>  
     <input type="button" @click="submit" value="提交">
@@ -133,7 +134,8 @@ export default {
     },
   },
   created() {
-
+    let {id} = this.$route.params
+    this.evaluationSheetid = id
   },
   
 }

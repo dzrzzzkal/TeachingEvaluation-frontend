@@ -57,12 +57,28 @@ const routes = [
     component: () => import(/* webpackChunkName: "class" */ '../views/Class.vue')
   },
   {
-    path: '/evaluationSheet',
+    path: '/evaluationProgress',
+    name: 'EvaluationProgress',
+    meta: {
+      auth: true
+    },
+    component: () => import(/* webpackChunkName: evaluationProgress" */ '../views/EvaluationProgress.vue')
+  },
+  {
+    path: '/evaluationSheet/:id',
     name: 'EvaluationSheet',
     meta: {
       auth: true
     },
     component: () => import(/* webpackChunkName: evaluationSheet" */ '../views/EvaluationSheet.vue')
+  },
+  {
+    path: '/evaluationSheetList',
+    name: 'EvaluationSheetList',
+    meta: {
+      auth: true
+    },
+    component: () => import(/* webpackChunkName: evaluationSheetList" */ '../views/EvaluationSheetList.vue')
   }
 ]
 

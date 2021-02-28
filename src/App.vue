@@ -7,7 +7,9 @@
     <router-link to="/logout">Logout</router-link> |
     <router-link to="/course">Course</router-link> |
     <router-link to="/class">Class</router-link> |
-    <router-link to="/evaluationSheet">Evaluation Sheet</router-link>
+    <router-link to="/evaluationProgress">Evaluation Progress</router-link> |
+    <router-link to="/evaluationSheet">Evaluation Sheet</router-link> |
+    <router-link to="/evaluationSheetList">Evaluation Sheet List</router-link>
     <!-- <router-link>Login</router-link> -->
   </div>
   <router-view/>
