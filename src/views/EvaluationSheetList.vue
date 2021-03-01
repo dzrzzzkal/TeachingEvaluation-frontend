@@ -6,6 +6,14 @@
       :props="{ multiple: true, checkStrictly: true }"
       clearable>
     </el-cascader>
+    <el-select v-model="schoolYearItem" placeholder="请选择学年" clearable>
+      <el-option
+        v-for="item in schoolYearOptions"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value">
+      </el-option>
+    </el-select>
     <div style="margin-top: 15px">
       <el-input
         placeholder="请输入内容"
@@ -217,6 +225,27 @@ export default defineComponent ({
       selectRangeOptions: [],
       searchRangeValue: [],
 
+      schoolYearOptions: [{
+        value: '2018年',
+        label: '2018年'
+      }, {
+        value: '2019年',
+        label: '2019年'
+      }, {
+        value: '2020年',
+        label: '2020年'
+      }, {
+        value: '2021年',
+        label: '2021年'
+      }, {
+        value: '2022年',
+        label: '2022年'
+      }, {
+        value: '2023年',
+        label: '2023年'
+      }],
+      schoolYearItem: '',
+
       evaluationSheetData: [],
       currentRow: null,
 
@@ -236,6 +265,7 @@ export default defineComponent ({
           pageSize: this.pageSize,
           searchRangeValue: this.searchRangeValue,
           searchItem: this.searchItem,
+          schoolYearItem: this.schoolYearItem,
           input: this.input,
         },
         headers: {

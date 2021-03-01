@@ -35,7 +35,13 @@
       </el-input>
     </div>
 
+    <div class="deansofficeEP" v-if="deansofficeQueryableEP">
+      ○ {{deansofficeQueryableEP}}
+    </div>
+    <button @click="exportExcel">导出</button>
+
     <el-table
+      id="out-table"
       ref="singleTable"
       :data="evaluationProgressData"
       highlight-current-row
@@ -61,12 +67,21 @@
         width="120">
       </el-table-column>
       <el-table-column
+        property="college"
+        label="单位"
+        width="120">
+      </el-table-column>
+      <el-table-column
+        property="dept"
+        label="系"
+        width="120">
+      </el-table-column>
+      <el-table-column
         property="progress"
         label="评估进度(被听课进度)"
         width="200">
         <template #default="scope">
-          <span>{{scope.row.submittedNum + ' / ' + scope.row.taskCount}}</span>
-          <span v-if="scope.row.role === '教师'">{{`  (${scope.row.beEvaluatedNum} / 1)`}}</span>
+          <span>{{scope.row.progress}}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -82,36 +97,6 @@
         label="年度报告"
         width="120">
       </el-table-column>
-      <!-- <el-table-column
-        label="评估表"
-        >
-        <template #default="scope">
-          <span class="clickrable-text" @click="clickEvaluationSheet(scope.row.id)">
-            {{scope.row.class_id + ' ' + scope.row.course_name}}
-          </span>
-        </template>
-      </el-table-column> -->
-      <!-- <el-table-column
-        property="submitter"
-        label="评估人"
-        width="100">
-        <template #default="scope">
-          <span class="clickrable-text" @click="searchSubmitter(scope.row.submitter)">{{scope.row.submitter}}</span>
-        </template>
-      </el-table-column> -->
-      <!-- <el-table-column
-        property="classification"
-        label="课程类型"
-        width="120">
-        <template #default="scope">
-          <span class="clickrable-text" @click="searchClassification(scope.row.classification)">{{scope.row.classification}}</span>
-        </template>
-      </el-table-column> -->
-      <!-- <el-table-column
-        property="followUp"
-        label="是否需要跟进"
-        width="120">
-      </el-table-column> -->
       <el-table-column label="操作（待弄）">
         <template #default="scope">
           <el-button
@@ -147,6 +132,9 @@
 import { defineComponent, ref } from 'vue'
 import {request} from '@/network/request'
 
+import FileSaver from 'file-saver'
+import XLSX from 'xlsx'
+
 export default defineComponent ({
   setup() {
     return {
@@ -180,6 +168,8 @@ export default defineComponent ({
       }],
       schoolYearItem: '',
 
+      deansofficeQueryableEP: '',
+
       evaluationProgressData: [],
       currentRow: null,
 
@@ -208,15 +198,17 @@ export default defineComponent ({
       }).then(res => {
         console.log('request success!')
         console.log(res)
-        let ep = res.ep
+        let {ep, deansofficeQueryableEP} = res
         this.evaluationProgressTotal = ep.count
         this.evaluationProgressData = ep.rows
+        let progress
         let isFinishProgress  // 设置评估进度完成情况
         if(ep.rows) {
           for(let i of this.evaluationProgressData) {
             let submittedNum = parseInt(i.submittedNum)
             let taskCount = parseInt(i.taskCount)
             if(i.role === '教师') {
+              progress = `${i.submittedNum} / ${i.taskCount} (${i.beEvaluatedNum} / 1)`
               let beEvaluatedNum = parseInt(i.beEvaluatedNum)
               if(submittedNum >= taskCount && beEvaluatedNum >= 1) {
                 isFinishProgress = '已完成'
@@ -224,17 +216,28 @@ export default defineComponent ({
                 isFinishProgress = '未完成'
               }
             }else {
+              progress = `${i.submittedNum} / ${i.taskCount}`
               if(submittedNum >= taskCount) {
                 isFinishProgress = '已完成'
               }else {
                 isFinishProgress = '未完成'
               }
             }
+            i.progress = progress
             i.isFinishProgress = isFinishProgress
           }
         }
+        if(deansofficeQueryableEP) {
+          let {notFinishedCount, range, teacherTotal} = deansofficeQueryableEP
+          if(notFinishedCount && range && teacherTotal) {
+            // console.log(`${range} 范围内，未完成听课工作人数： ${notFinishedCount} / ${teacherTotal}`)
+            this.deansofficeQueryableEP = `${range} 范围内，未完成听课工作人数： ${notFinishedCount} / ${teacherTotal}`
+          }else {
+            this.deansofficeQueryableEP = deansofficeQueryableEP
+          }
+        }
         
-        console.log(this.evaluationProgressData)
+        // console.log(this.evaluationProgressData)
 
         this.selectRangeOptions = res.selectRangeOptions
       }).catch(err => {
@@ -257,6 +260,66 @@ export default defineComponent ({
       this.currentPage = val
       this.requestEvaluationProgress()
     },
+
+    exportExcel () {
+      // 请求用来导出的evaluationProgress。区别是，这里不需要分页，不需要赋值给this.evaluationSheetData、this.selectRangeOptions、this.deansofficeQueryableEP
+      request({
+        url: '/downLoadEvaluationProgress',
+        method: 'post',
+        data: {
+          searchRangeValue: this.searchRangeValue,
+          searchItem: this.searchItem,
+          schoolYearItem: this.schoolYearItem,
+          input: this.input,
+        },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(res => {
+        // let {ep} = res
+        let ep = res
+        let progress
+        let isFinishProgress  // 设置评估进度完成情况
+        for(let i of ep) {
+          let submittedNum = parseInt(i.submittedNum)
+          let taskCount = parseInt(i.taskCount)
+          if(i.role === '教师') {
+            progress = `${i.submittedNum} / ${i.taskCount} (${i.beEvaluatedNum} / 1)`
+            let beEvaluatedNum = parseInt(i.beEvaluatedNum)
+            if(submittedNum >= taskCount && beEvaluatedNum >= 1) {
+              isFinishProgress = '已完成'
+            }else {
+              isFinishProgress = '未完成'
+            }
+          }else {
+            progress = `${i.submittedNum} / ${i.taskCount}`
+            if(submittedNum >= taskCount) {
+              isFinishProgress = '已完成'
+            }else {
+              isFinishProgress = '未完成'
+            }
+          }
+          i.progress = progress
+          i.isFinishProgress = isFinishProgress
+        }
+        require.ensure([], () => {
+          const {export_json_to_excel} = require('@/vendor/Export2Excel')
+          const tHeader = ['教师工号', '姓名', '角色', '单位', '系', '评估进度(被听课进度)', '评估完成情况', '年度报告']
+          const filterVal = ['jobid', 'name', 'role', 'college', 'dept', 'progress', 'isFinishProgress', 'annualReport']
+          const list = ep
+          const data = this.formatJson(filterVal, list)
+          export_json_to_excel(tHeader, data, 'evaluationProgressExcel')
+        })
+      }).catch(err => {
+        console.log('request fail')
+        console.log(err)
+      })
+    },
+
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]))
+    }
+
   },
   created() {
     // 设置 schoolYearItem
@@ -286,5 +349,15 @@ export default defineComponent ({
   .clickrable-text {
     cursor : pointer;
     text-decoration: underline;
+  }
+
+  .deansofficeEP {
+    display: block;
+    height: 50px;
+    line-height: 50px;
+    float: left;
+    border: 1px solid rgb(182, 178, 178, .8);
+    padding: 0 50px;
+    margin: 10px;
   }
 </style>
