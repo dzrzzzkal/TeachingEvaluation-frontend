@@ -38,7 +38,12 @@
     <div class="deansofficeEP" v-if="deansofficeQueryableEP">
       ○ {{deansofficeQueryableEP}}
     </div>
-    <button @click="exportExcel">导出</button>
+    <el-button
+      :loading="loadingExport"
+      size="medium"
+      type="primary"
+      @click="exportExcel">导出
+    </el-button>
 
     <el-table
       id="out-table"
@@ -144,6 +149,8 @@ export default defineComponent ({
   },
   data() {
     return {
+      loadingExport: false,
+
       selectRangeOptions: [],
       searchRangeValue: [],
 
@@ -262,9 +269,10 @@ export default defineComponent ({
     },
 
     exportExcel () {
+      this.loadingExport = true
       // 请求用来导出的evaluationProgress。区别是，这里不需要分页，不需要赋值给this.evaluationSheetData、this.selectRangeOptions、this.deansofficeQueryableEP
       request({
-        url: '/downLoadEvaluationProgress',
+        url: '/exportEvaluationProgress',
         method: 'post',
         data: {
           searchRangeValue: this.searchRangeValue,
@@ -314,6 +322,7 @@ export default defineComponent ({
         console.log('request fail')
         console.log(err)
       })
+      this.loadingExport = false
     },
 
     formatJson(filterVal, jsonData) {

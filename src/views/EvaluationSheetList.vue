@@ -30,7 +30,7 @@
           </el-select> -->
 
           <!-- <span style="border: 20px solid transparent"></span> -->
-          <el-select v-model="searchItem" clearable placeholder="请选择">
+          <el-select v-model="searchItem" placeholder="请选择">
             <el-option label="课程编号" value="class_id"></el-option>
             <el-option label="课程名" value="course_name"></el-option>
             <el-option label="评估人" value="submitter"></el-option>
@@ -42,6 +42,14 @@
         </template>
       </el-input>
     </div>
+
+    <el-button
+      :loading="loadingExport"
+      size="medium"
+      type="primary"
+      @click="exportExcel">
+      导出
+    </el-button>
 
     <el-table
       ref="singleTable"
@@ -59,11 +67,15 @@
         width="120">
       </el-table-column>
       <el-table-column
+        property="sheet_name"
         label="评估表"
         >
         <template #default="scope">
-          <span class="clickrable-text" @click="clickEvaluationSheet(scope.row.id)">
+          <!-- <span class="clickrable-text" @click="clickEvaluationSheet(scope.row.id)">
             {{scope.row.class_id + ' ' + scope.row.course_name}}
+          </span> -->
+          <span class="clickrable-text" @click="clickEvaluationSheet(scope.row.id)">
+            {{scope.row.sheet_name}}
           </span>
         </template>
       </el-table-column>
@@ -136,6 +148,8 @@ export default defineComponent ({
 
   data() {
     return {
+      loadingExport: false,
+
       // selectRangeOptions: [
       //   {
       //     value: 'school',
@@ -278,6 +292,11 @@ export default defineComponent ({
         let es = res.es
         this.evaluationSheetTotal = es.count
         this.evaluationSheetData = es.rows
+        for(let i of this.evaluationSheetData) {
+          let {class_id, course_name} = i
+          let sheet_name = class_id + ' ' + course_name
+          i.sheet_name = sheet_name
+        }
 
         this.selectRangeOptions = res.selectRangeOptions
       }).catch(err => {
@@ -337,6 +356,53 @@ export default defineComponent ({
       this.currentPage = val
       this.requestEvaluationSheet()
     },
+
+    exportExcel() {
+      this.loadingExport = true
+      console.log('exportExcel')
+      request({
+        url: '/exportEvaluationSheetList',
+        method: 'post',
+        data: {
+          // currentPage: this.currentPage,
+          // pageSize: this.pageSize,
+          searchRangeValue: this.searchRangeValue,
+          searchItem: this.searchItem,
+          schoolYearItem: this.schoolYearItem,
+          input: this.input,
+        },
+        headers: {
+          // 'Content-Type': 'application/json'
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(res => {
+        console.log('export request success!')
+        console.log(res)
+        let es = res
+        for(let i of es) {
+          let {class_id, course_name} = i
+          let sheet_name = class_id + ' ' + course_name
+          i.sheet_name = sheet_name
+        }
+        require.ensure([], () => {
+          const {export_json_to_excel} = require('@/vendor/Export2Excel')
+          const tHeader = ['提交日期', '评估表', '评估人', '课程类型', '是否需要跟进']
+          const filterVal = ['submit_time', 'sheet_name', 'submitter', 'classification', 'followUp']
+          const list = es
+          const data = this.formatJson(filterVal, list)
+          export_json_to_excel(tHeader, data, 'evaluationListExcel')
+        })
+      }).catch(err => {
+        console.log('request fail')
+        console.log(err)
+      })
+      this.loadingExport = false
+    },
+
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]))
+    },
+
   },
   created() {
     this.requestEvaluationSheet()
