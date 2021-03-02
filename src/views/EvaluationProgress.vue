@@ -136,6 +136,7 @@
 <script>
 import { defineComponent, ref } from 'vue'
 import {request} from '@/network/request'
+import { ElMessage } from 'element-plus'
 
 import FileSaver from 'file-saver'
 import XLSX from 'xlsx'
@@ -145,6 +146,13 @@ export default defineComponent ({
     return {
       input: ref(''),
       searchItem: ref(''),
+
+      alertNoData() {
+        ElMessage.warning({
+          message: '当前没有数据可以导出哦',
+          type: 'warning'
+        })
+      },
     }
   },
   data() {
@@ -183,6 +191,12 @@ export default defineComponent ({
       evaluationProgressTotal: 0,
       currentPage: 1,
       pageSize: 3,
+
+      // 实际最新点击了搜索按钮之后的查询条件。成功搜索后设置，防止后来点击修改了新的查询条件，但是没点击'搜索'的情况下，点击'导出'
+      searchedSearchRangeValue: [], 
+      searchedSchoolYearItem: '',
+      searchedInput: '',
+      searchedSearchItem: '',
     }
   },
   methods: {
@@ -205,7 +219,9 @@ export default defineComponent ({
       }).then(res => {
         console.log('request success!')
         console.log(res)
+        this.selectRangeOptions = res.selectRangeOptions
         let {ep, deansofficeQueryableEP} = res
+        // ↓即使搜索结果为空，ep会返回{count:0, rows:[]}
         this.evaluationProgressTotal = ep.count
         this.evaluationProgressData = ep.rows
         let progress
@@ -237,16 +253,16 @@ export default defineComponent ({
         if(deansofficeQueryableEP) {
           let {notFinishedCount, range, teacherTotal} = deansofficeQueryableEP
           if(notFinishedCount && range && teacherTotal) {
-            // console.log(`${range} 范围内，未完成听课工作人数： ${notFinishedCount} / ${teacherTotal}`)
             this.deansofficeQueryableEP = `${range} 范围内，未完成听课工作人数： ${notFinishedCount} / ${teacherTotal}`
           }else {
             this.deansofficeQueryableEP = deansofficeQueryableEP
           }
         }
-        
-        // console.log(this.evaluationProgressData)
 
-        this.selectRangeOptions = res.selectRangeOptions
+        this.searchedSearchRangeValue = this.searchRangeValue
+        this.searchedSchoolYearItem = this.schoolYearItem
+        this.searchedInput = this.input
+        this.searchedSearchItem = this.searchItem
       }).catch(err => {
         console.log('request fail')
         console.log(err)
@@ -269,22 +285,27 @@ export default defineComponent ({
     },
 
     exportExcel () {
+      if(!this.evaluationProgressData.length) {
+        this.alertNoData()
+        return
+      }
       this.loadingExport = true
       // 请求用来导出的evaluationProgress。区别是，这里不需要分页，不需要赋值给this.evaluationSheetData、this.selectRangeOptions、this.deansofficeQueryableEP
       request({
         url: '/exportEvaluationProgress',
         method: 'post',
         data: {
-          searchRangeValue: this.searchRangeValue,
-          searchItem: this.searchItem,
-          schoolYearItem: this.schoolYearItem,
-          input: this.input,
+          searchRangeValue: this.searchedSearchRangeValue,
+          searchItem: this.searchedSearchItem,
+          schoolYearItem: this.searchedSchoolYearItem,
+          input: this.searchedInput,
         },
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(res => {
-        // let {ep} = res
+        console.log('export request success!')
+        console.log(res)
         let ep = res
         let progress
         let isFinishProgress  // 设置评估进度完成情况

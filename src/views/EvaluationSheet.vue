@@ -4,7 +4,7 @@
     <div>evaluationSheetid：{{evaluationSheetid}}</div>
     <input type="text" v-model="evaluationSheetid" placeholder="evaluation sheet id">
     <br>  
-    <input type="button" @click="submit" value="提交">
+    <input type="button" @click="submit" value="download">
     <br>
     
     <button @click="download">下载</button>
@@ -26,6 +26,26 @@ export default {
     } 
   },
   methods: {
+    requestEvaluationSheet() {
+      return request({
+        url: '/evaluationSheet/' + this.evaluationSheetid,
+        // url: '/es',
+        method: 'get',
+        // responseType: 'blob',
+        // params: {
+
+        // },
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(res => {
+        // 以下不需要res.data.xxx，因为响应拦截器已经拦截了，直接返回的就是res.data
+        console.log(res)
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     submit() {
        function downloadFile(res, fileName) {
         if (!res) {
@@ -136,6 +156,8 @@ export default {
   created() {
     let {id} = this.$route.params
     this.evaluationSheetid = id
+
+    this.requestEvaluationSheet()
   },
   
 }

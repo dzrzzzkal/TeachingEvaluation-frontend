@@ -62,7 +62,7 @@ const routes = [
     meta: {
       auth: true
     },
-    component: () => import(/* webpackChunkName: evaluationProgress" */ '../views/EvaluationProgress.vue')
+    component: () => import(/* webpackChunkName: "evaluationProgress" */ '../views/EvaluationProgress.vue')
   },
   {
     path: '/evaluationSheet/:id',
@@ -70,7 +70,7 @@ const routes = [
     meta: {
       auth: true
     },
-    component: () => import(/* webpackChunkName: evaluationSheet" */ '../views/EvaluationSheet.vue')
+    component: () => import(/* webpackChunkName: "evaluationSheet" */ '../views/EvaluationSheet.vue')
   },
   {
     path: '/evaluationSheetList',
@@ -78,7 +78,7 @@ const routes = [
     meta: {
       auth: true
     },
-    component: () => import(/* webpackChunkName: evaluationSheetList" */ '../views/EvaluationSheetList.vue')
+    component: () => import(/* webpackChunkName: "evaluationSheetList" */ '../views/EvaluationSheetList.vue')
   }
 ]
 

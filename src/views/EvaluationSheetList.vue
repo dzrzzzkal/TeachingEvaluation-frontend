@@ -136,6 +136,7 @@
 <script>
 import { defineComponent, ref } from 'vue'
 import {request} from '@/network/request'
+import { ElMessage } from 'element-plus'
 
 export default defineComponent ({
   setup() {
@@ -143,6 +144,13 @@ export default defineComponent ({
       input: ref(''),
       // searchRange: ref(''),
       searchItem: ref('course_name'),
+
+      alertNoData() {
+        ElMessage.warning({
+          message: '当前没有数据可以导出哦',
+          type: 'warning'
+        })
+      },
     }
   },
 
@@ -266,6 +274,13 @@ export default defineComponent ({
       evaluationSheetTotal: 0,
       currentPage: 1,
       pageSize: 3,
+
+      // 实际最新点击了搜索按钮之后的查询条件。成功搜索后设置，防止后来点击修改了新的查询条件，但是没点击'搜索'的情况下，点击'导出'
+      searchedSearchRangeValue: [], 
+      searchedSchoolYearItem: '',
+      searchedInput: '',
+      searchedSearchItem: 'course_name',
+
     }
   },
 
@@ -289,16 +304,23 @@ export default defineComponent ({
       }).then(res => {
         console.log('request success!')
         console.log(res)
+        this.selectRangeOptions = res.selectRangeOptions
         let es = res.es
-        this.evaluationSheetTotal = es.count
-        this.evaluationSheetData = es.rows
-        for(let i of this.evaluationSheetData) {
-          let {class_id, course_name} = i
-          let sheet_name = class_id + ' ' + course_name
-          i.sheet_name = sheet_name
+        // 若搜索结果为空返回的es: []
+        this.evaluationSheetTotal = es.count ? es.count : 0
+        this.evaluationSheetData = es.rows ? es.rows : []
+        if(es.rows) {
+          for(let i of this.evaluationSheetData) {
+            let {class_id, course_name} = i
+            let sheet_name = class_id + ' ' + course_name
+            i.sheet_name = sheet_name
+          }
         }
 
-        this.selectRangeOptions = res.selectRangeOptions
+        this.searchedSearchRangeValue = this.searchRangeValue
+        this.searchedSchoolYearItem = this.schoolYearItem
+        this.searchedInput = this.input
+        this.searchedSearchItem = this.searchItem
       }).catch(err => {
         console.log('request fail')
         console.log(err)
@@ -358,18 +380,21 @@ export default defineComponent ({
     },
 
     exportExcel() {
+      if(!this.evaluationSheetData.length) {
+        this.alertNoData()
+        return
+      }
       this.loadingExport = true
-      console.log('exportExcel')
       request({
         url: '/exportEvaluationSheetList',
         method: 'post',
         data: {
           // currentPage: this.currentPage,
           // pageSize: this.pageSize,
-          searchRangeValue: this.searchRangeValue,
-          searchItem: this.searchItem,
-          schoolYearItem: this.schoolYearItem,
-          input: this.input,
+          searchRangeValue: this.searchedSearchRangeValue,
+          searchItem: this.searchedSearchItem,
+          schoolYearItem: this.searchedSchoolYearItem,
+          input: this.searchedInput,
         },
         headers: {
           // 'Content-Type': 'application/json'
