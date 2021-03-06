@@ -79,6 +79,14 @@ const routes = [
       auth: true
     },
     component: () => import(/* webpackChunkName: "evaluationSheetList" */ '../views/EvaluationSheetList.vue')
+  },
+  {
+    path: '/annualReportList',
+    name: 'AnnualReportList',
+    meta: {
+      auth: true
+    },
+    component: () => import(/* webpackChunkName: "annualReportList" */ '../views/AnnualReportList.vue')
   }
 ]
 
