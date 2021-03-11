@@ -110,6 +110,7 @@ export default {
   },
   created() {
     let {
+      id,
       course_setupUnit, course_name, class_id, teacher_name, class_time, place, attend_num, actual_num, role,
       // environment,
       evaluationList,
@@ -125,6 +126,7 @@ export default {
     this.evaluationList = evaluationList
     this.overallEvaluation = {appreciateMethod, concreteSuggestion, familiarity, extension, followUp, otherSuggestion, submitter, submit_time}
     this.followUpRecord = {
+      id,
       followUpDegree, 
       followUpParticipantSuggestion, followUpParticipant, followUpParticipantTime, 
       followUpCollegeSuggestion, followUpCollege, followUpCollegeTime, 
