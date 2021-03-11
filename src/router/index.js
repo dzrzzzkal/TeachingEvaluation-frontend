@@ -114,7 +114,8 @@ router.beforeEach((to, from, next) => {
       // 但是后续改成userinfo{}的话，应该除了user，其他的都要清空，后续再改吧
       // store.commit('SET_USERINFO', {userInfo: {}, status: false})
       store.commit('SET_USERINFO', {user: store.state.user, status: false,})
-      console.log('请先登录')
+      // console.log('请先登录')
+      alert('请先登录')
       next({path: '/login'})
     } else {  // 有token才发送请求，检查token是过期还是可用
       // 这里重复了吧，前端每次都要对后端进行一次请求，判断token是否过期，而后端每次都会拦截，判断token是否过期，相当于前后台都判断了
@@ -134,7 +135,8 @@ router.beforeEach((to, from, next) => {
           next()
         } else {  // tokenCode == 20001 token已过期
           console.log('token已失效')
-          console.log('请先登录')
+          // console.log('请先登录')
+          alert('请先登录')
           next({path: '/login'})
         }
       })

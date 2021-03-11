@@ -20,7 +20,8 @@ export default {
       this.$store.commit('SET_USERINFO', {user: this.$store.state.user, status: false})
       localStorage.removeItem('token')
       localStorage.removeItem('tokenCode')
-      console.log('登出')
+      alert('登出成功。')
+      this.$router.replace('/login')
     },
   }
 }

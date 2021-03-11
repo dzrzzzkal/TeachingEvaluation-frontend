@@ -11,9 +11,25 @@
 
 <script>
 import { request } from '@/network/request'
+import { defineComponent } from 'vue'
+import { ElMessage } from 'element-plus'
 // import { mapMutations } from 'vuex'
 
-export default {
+export default defineComponent({
+  setup() {
+    return {
+      showSuccess(msg) {
+        ElMessage.success({
+          message: msg,
+          type: 'success'
+        });
+      },
+      showError(msg) {
+        ElMessage.error(msg);
+      }
+    }
+  },
+
   data() {
     return {
       user: '',
@@ -54,13 +70,19 @@ export default {
         //   user: res.user
         // })
         // this.SET_TOKEN(res)
-        localStorage.setItem('token', res.token)
-        localStorage.setItem('tokenCode', res.tokenCode)
-        this.$store.commit('SET_USERINFO', {user: res.user, status: res.status})
-        // this.SET_USERINFO(res)
-        this.$router.push('/about')
+        if(res.code === 200 && res.token) { // 登录成功
+          this.showSuccess('登录成功')
+          localStorage.setItem('token', res.token)
+          localStorage.setItem('tokenCode', res.tokenCode)
+          this.$store.commit('SET_USERINFO', {user: res.user, status: res.status})
+          // this.SET_USERINFO(res)
+          this.$router.push('/about')
+        }else { // 登录失败
+          this.showError('用户名或密码错误')
+        }
+        
       }).catch(err => {
-        console.log(err)
+        this.showError('请求失败')
       })
     },
   },
@@ -68,7 +90,7 @@ export default {
 
   },
   
-}
+})
 
 
 </script>

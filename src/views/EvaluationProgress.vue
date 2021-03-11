@@ -153,6 +153,9 @@ export default defineComponent ({
           type: 'warning'
         })
       },
+      alertRequestFail() {
+        ElMessage.error('请求失败')
+      },
     }
   },
   data() {
@@ -219,6 +222,10 @@ export default defineComponent ({
       }).then(res => {
         console.log('request success!')
         console.log(res)
+        if(!res) {
+          this.alertRequestFail()
+          return
+        }
         this.selectRangeOptions = res.selectRangeOptions
         let {ep, deansofficeQueryableEP} = res
         // ↓即使搜索结果为空，ep会返回{count:0, rows:[]}
@@ -252,7 +259,7 @@ export default defineComponent ({
         }
         if(deansofficeQueryableEP) {
           let {notFinishedCount, range, teacherTotal} = deansofficeQueryableEP
-          if(notFinishedCount && range && teacherTotal) {
+          if((notFinishedCount || notFinishedCount == 0) && range && (teacherTotal || teacherTotal == 0)) {   // if(0)不执行
             this.deansofficeQueryableEP = `${range} 范围内，未完成听课工作人数： ${notFinishedCount} / ${teacherTotal}`
           }else {
             this.deansofficeQueryableEP = deansofficeQueryableEP
