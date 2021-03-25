@@ -47,7 +47,7 @@
       :props="timeProps"
       v-model="time"
       clearable
-      @change="">
+      >
     </el-cascader>
     <br>
     <el-select v-model="teacher" multiple filterable placeholder=教师>
@@ -99,6 +99,20 @@ export default defineComponent({
       selectedRule: ref(''),   // 选课规则
       teachingMaterial: ref([]),   // 教材
       // student_id: ref(''),  // 学生学号
+
+      createSuccess() {
+        ElMessage({
+          showClose: true,
+          message: '创建成功。',
+          type: 'success'
+        })
+      },
+      createFail() {
+        ElMessage.warning({
+          message: '创建失败',
+          type: 'error'
+        })
+      }
     }
   },
   data() {
@@ -350,8 +364,8 @@ export default defineComponent({
 
   methods: {
     submit() {
-      console.log('this.time')
-      console.log(this.time)
+      // console.log('this.time')
+      // console.log(this.time)
       return request({
         url: '/create-class',
         method: 'post',
@@ -374,40 +388,16 @@ export default defineComponent({
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(res => {
-        console.log('request success!')
+        this.createSuccess()
         console.log(res)
       }).catch(err => {
-        console.log('request fail')
+        this.createFail()
         console.log(err)
       })
     },
 
-    submit1() {
-      console.log(this.user)
-      console.log(this.pass)
-      console.log(this.college)
-      console.log(this.dept)
-    },
-
-    // vue-admin-template的request()格式↓
-    // fetchList(query) {
-    //   return request({
-    //     url: '/string',
-    //     method: 'get',
-    //     params: query,
-    //   })
-    // },
-    // fetchData() {
-    //   this.fetchList().then(res => {
-    //     this.string = res
-    //     console.log(res)
-    //   }).catch(err => {
-    //     console.log(err)
-    //   })
-    // }
   },
   created() {
-    // this.fetchData()
   },
   
 })

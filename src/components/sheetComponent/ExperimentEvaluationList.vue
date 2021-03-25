@@ -2,11 +2,6 @@
   <div class="content">
     <div class="box">
       <el-table id="out-table" :data="elData" border :span-method="objectSpanMethod" style="width: 100%">
-        <!-- <el-table-column
-          property="event"
-          label="项目"
-          width="100%">
-        </el-table-column> -->
         <el-table-column
           property="category"
           label="类别"

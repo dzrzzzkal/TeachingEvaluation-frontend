@@ -21,14 +21,6 @@
         class="input-with-select"
         clearable
       >
-        <!-- <template #prepend>
-          <el-select v-model="searchItem" placeholder="请选择">
-            <el-option label="课程编号" value="class_id"></el-option>
-            <el-option label="课程名" value="course_name"></el-option>
-            <el-option label="评估人" value="submitter"></el-option>
-            <el-option label="课程类型" value="classification"></el-option>
-          </el-select>
-        </template> -->
         <template #append>
           <el-button icon="el-icon-search" @click="search"></el-button>
         </template>
@@ -90,22 +82,7 @@
         label="系"
         width="120">
       </el-table-column>
-      <el-table-column label="操作（待弄）">
-        <template #default="scope">
-          <el-button
-            size="mini"
-            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-        </template>
-      </el-table-column>
     </el-table>
-    <div style="margin-top: 20px">
-      <el-button @click="setCurrent(annualReportData[1])">选中第二行</el-button>
-      <el-button @click="setCurrent()">取消选择</el-button>
-    </div>
 
     <div class="block">
       <el-pagination
@@ -132,8 +109,6 @@ export default defineComponent ({
   setup() {
     return {
       input: ref(''),
-      // searchRange: ref(''),
-      // searchItem: ref('course_name'),
 
       alertNoData() {
         ElMessage.warning({
@@ -189,7 +164,6 @@ export default defineComponent ({
       searchedSearchRangeValue: [], 
       searchedSchoolYearItem: '',
       searchedInput: '',
-      // searchedSearchItem: 'course_name',
 
     }
   },
@@ -203,12 +177,10 @@ export default defineComponent ({
           currentPage: this.currentPage,
           pageSize: this.pageSize,
           searchRangeValue: this.searchRangeValue,
-          // searchItem: this.searchItem,
           schoolYearItem: this.schoolYearItem,
           input: this.input,
         },
         headers: {
-          // 'Content-Type': 'application/json'
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(res => {
@@ -227,7 +199,6 @@ export default defineComponent ({
         this.searchedSearchRangeValue = this.searchRangeValue
         this.searchedSchoolYearItem = this.schoolYearItem
         this.searchedInput = this.input
-        // this.searchedSearchItem = this.searchItem
       }).catch(err => {
         console.log('request fail')
         console.log(err)
@@ -248,7 +219,7 @@ export default defineComponent ({
         if (window.navigator.msSaveBlob) {  // IE以及IE内核的浏览器
           try {
             window.navigator.msSaveBlob(res, fileName)  // res为接口返回数据，这里请求的时候已经处理了，如果没处理需要在此之前自行处理var data = new Blob([res.data]) 注意这里需要是数组形式的,fileName就是下载之后的文件名
-            // window.navigator.msSaveOrOpenBlob(res, fileName);  //此方法类似上面的方法，区别可自行百度
+            // window.navigator.msSaveOrOpenBlob(res, fileName)
           } catch (e) {
             console.log(e)
           }
@@ -282,21 +253,10 @@ export default defineComponent ({
 
     // 点击"评估人"，搜索对应的submitter的evlauationSheetList
     searchSubmitter(submitter) {
-      // this.searchItem = 'submitter'
       this.input = submitter
       this.requestAnnualReport()
     },
 
-
-    handleEdit(index, row) {
-      console.log(index, row);
-    },
-    handleDelete(index, row) {
-      console.log(index, row);
-    },
-    setCurrent(row) {
-      this.$refs.singleTable.setCurrentRow(row);
-    },
     handleCurrentChange(val) {
       this.currentRow = val;
     },
@@ -322,15 +282,11 @@ export default defineComponent ({
         url: '/exportAnnualReportList',
         method: 'post',
         data: {
-          // currentPage: this.currentPage,
-          // pageSize: this.pageSize,
           searchRangeValue: this.searchedSearchRangeValue,
-          // searchItem: this.searchedSearchItem,
           schoolYearItem: this.searchedSchoolYearItem,
           input: this.searchedInput,
         },
         headers: {
-          // 'Content-Type': 'application/json'
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(res => {

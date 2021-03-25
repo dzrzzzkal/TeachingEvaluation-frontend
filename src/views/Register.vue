@@ -76,6 +76,20 @@ export default defineComponent({
       role: ref(''),   // 听课角色
       dean: ref(''),   // 是否为系主任
       deansoffice: ref(''),   // 是什么教务管理人员（非教务管理人员、教务处、学院、系）
+
+      createSuccess() {
+        ElMessage({
+          showClose: true,
+          message: '注册成功。',
+          type: 'success'
+        })
+      },
+      createFail() {
+        ElMessage.warning({
+          message: '注册失败',
+          type: 'error'
+        })
+      }
     }
   },
   data() {
@@ -194,20 +208,6 @@ export default defineComponent({
           label: '系'
         },
       ],
-
-      // // 表单
-      // // 表user
-      // user: '',   // 用户名
-      // pass: '',   // 密码
-
-      // // 表userinfo
-      // jobid: '',  // 工号
-      // name: '',   // 姓名
-      // college: '',// 学院
-      // dept: '',   // 系
-      // role: '',   // 听课角色
-      // dean: '',   // 是否为系主任
-      // deansoffice: '', // 是什么教务管理人员（非教务管理人员、教务处、学院、系）
     } 
   },
 
@@ -233,38 +233,15 @@ export default defineComponent({
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(res => {
+        this.createSuccess()
         console.log(res)
       }).catch(err => {
+        this.createFail()
         console.log(err)
       })
     },
-
-    submit1() {
-      console.log(this.user)
-      console.log(this.pass)
-      console.log(this.college)
-      console.log(this.dept)
-    },
-
-    // vue-admin-template的request()格式↓
-    // fetchList(query) {
-    //   return request({
-    //     url: '/string',
-    //     method: 'get',
-    //     params: query,
-    //   })
-    // },
-    // fetchData() {
-    //   this.fetchList().then(res => {
-    //     this.string = res
-    //     console.log(res)
-    //   }).catch(err => {
-    //     console.log(err)
-    //   })
-    // }
   },
   created() {
-    // this.fetchData()
   },
   
 })

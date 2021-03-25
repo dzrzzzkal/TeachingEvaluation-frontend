@@ -13,7 +13,6 @@
 import { request } from '@/network/request'
 import { defineComponent } from 'vue'
 import { ElMessage } from 'element-plus'
-// import { mapMutations } from 'vuex'
 
 export default defineComponent({
   setup() {
@@ -37,20 +36,10 @@ export default defineComponent({
     } 
   },
   methods: {
-    // ...mapMutations([
-    //   // 'nameOfMutation', //also supports payload `this.nameOfMutation(amount)` 
-    //   // 'SET_TOKEN',
-    //   'SET_USERINFO'
-    // ]),
-
     submit() {
       return request({
         url: '/doLogin',
         method: 'post',
-        // data: JSON.stringify({
-        //   user: this.user,
-        //   pass: this.pass
-        // }),
         data: {
           user: this.user,
           pass: this.pass
@@ -60,16 +49,6 @@ export default defineComponent({
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(res => {
-        // 以下不需要res.data.xxx，因为响应拦截器已经拦截了，直接返回的就是res.data
-        // console.log(res)
-
-        // vuex
-        // this.LOGIN({
-        //   // tokenCode: res.tokenCode,
-        //   token: res.token,
-        //   user: res.user
-        // })
-        // this.SET_TOKEN(res)
         if(res.code === 200 && res.token) { // 登录成功
           this.showSuccess('登录成功')
           localStorage.setItem('token', res.token)

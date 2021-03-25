@@ -1,8 +1,5 @@
 <template>
   <div class="content">
-    <!-- <div class="subtitle"></div> -->
-    <!-- <div class="box">
-    </div> -->
     <el-table
       border
       :show-header="false"

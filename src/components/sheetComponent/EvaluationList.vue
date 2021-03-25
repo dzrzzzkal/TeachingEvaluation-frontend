@@ -81,7 +81,7 @@ export default {
       }
     },
 
-    objectSpanMethod({ row, column, rowIndex, columnIndex }) {  // span为0好像不展示
+    objectSpanMethod({ row, column, rowIndex, columnIndex }) {  // span为0不展示
       // 页面列表上 表格合并行 -> 第几列(从0开始)
       // 需要合并多个单元格时 依次增加判断条件即可
       let that = this

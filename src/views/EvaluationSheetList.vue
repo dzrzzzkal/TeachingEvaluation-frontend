@@ -22,14 +22,6 @@
         clearable
       >
         <template #prepend>
-          <!-- <el-select v-model="searchRange" placeholder="请选择">
-            <el-option label="全校" value="school"></el-option>
-            <el-option label="学院" value="college"></el-option>
-            <el-option label="系" value="dept"></el-option>
-            <el-option label="我的" value="my"></el-option>
-          </el-select> -->
-
-          <!-- <span style="border: 20px solid transparent"></span> -->
           <el-select v-model="searchItem" placeholder="请选择">
             <el-option label="课程编号" value="class_id"></el-option>
             <el-option label="课程名" value="course_name"></el-option>
@@ -71,9 +63,6 @@
         label="评估表"
         >
         <template #default="scope">
-          <!-- <span class="clickrable-text" @click="clickEvaluationSheet(scope.row.id)">
-            {{scope.row.class_id + ' ' + scope.row.course_name}}
-          </span> -->
           <span class="clickrable-text" @click="clickEvaluationSheet(scope.row.id)">
             {{scope.row.sheet_name}}
           </span>
@@ -100,22 +89,7 @@
         label="是否需要跟进"
         width="120">
       </el-table-column>
-      <el-table-column label="操作（待弄）">
-        <template #default="scope">
-          <el-button
-            size="mini"
-            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-        </template>
-      </el-table-column>
     </el-table>
-    <div style="margin-top: 20px">
-      <el-button @click="setCurrent(evaluationSheetData[1])">选中第二行</el-button>
-      <el-button @click="setCurrent()">取消选择</el-button>
-    </div>
 
     <div class="block">
       <el-pagination
@@ -355,15 +329,6 @@ export default defineComponent ({
     },
 
 
-    handleEdit(index, row) {
-      console.log(index, row);
-    },
-    handleDelete(index, row) {
-      console.log(index, row);
-    },
-    setCurrent(row) {
-      this.$refs.singleTable.setCurrentRow(row);
-    },
     handleCurrentChange(val) {
       this.currentRow = val;
     },

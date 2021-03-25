@@ -40,18 +40,6 @@
     <br>
     <el-input type="textarea" v-model="briefIntro" placeholder="课程简介"></el-input>
     <br>
-    <!-- <el-upload
-      action=""
-      :on-preview=""
-      :on-remove=""
-      :before-remove=""
-      multiple
-      :limit="3"
-      :on-exceed=""
-      :file-list="[{name: 'name', url: 'url'}]">
-      <el-button size="small" type="primary">点击上传课程大纲</el-button>
-      <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-    </el-upload> -->
     <el-input v-model="syllabus" placeholder="课程大纲——文件链接"></el-input>
     <br>
     <el-select v-model="ap" multiple filterable placeholder="先修课程">
@@ -96,6 +84,20 @@ export default defineComponent({
       syllabus: ref(''),  // 课程大纲——文件
       ap: ref([]),   // 先修课程
       fp: ref([]),   // 同修课程
+
+      createSuccess() {
+        ElMessage({
+          showClose: true,
+          message: '创建成功。',
+          type: 'success'
+        })
+      },
+      createFail() {
+        ElMessage.warning({
+          message: '创建失败',
+          type: 'error'
+        })
+      }
     }
   },
   data() {
@@ -216,37 +218,14 @@ export default defineComponent({
         }
       }).then(res => {
         // console.log(res)
+        this.createSuccess()
       }).catch(err => {
+        this.createFail()
         console.log(err)
       })
     },
-
-    submit1() {
-      console.log(this.user)
-      console.log(this.pass)
-      console.log(this.college)
-      console.log(this.dept)
-    },
-
-    // vue-admin-template的request()格式↓
-    // fetchList(query) {
-    //   return request({
-    //     url: '/string',
-    //     method: 'get',
-    //     params: query,
-    //   })
-    // },
-    // fetchData() {
-    //   this.fetchList().then(res => {
-    //     this.string = res
-    //     console.log(res)
-    //   }).catch(err => {
-    //     console.log(err)
-    //   })
-    // }
   },
   created() {
-    // this.fetchData()
   },
   
 })
