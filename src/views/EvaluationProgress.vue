@@ -46,6 +46,7 @@
     </el-button>
 
     <el-table
+      v-if="searchedSearchItem != 'notSubmitAnnualReport' && searchedSearchItem != 'submittedAnnualReport'"
       id="out-table"
       ref="singleTable"
       :data="evaluationProgressData"
@@ -83,41 +84,80 @@
       </el-table-column>
       <el-table-column
         property="progress"
-        label="评估进度(被听课进度)"
-        width="200">
+        label="听课进度(被听课进度)"
+        width="250">
         <template #default="scope">
           <span>{{scope.row.progress}}</span>
         </template>
       </el-table-column>
       <el-table-column
         property="isFinishProgress"
-        label="评估完成情况"
+        label="听课完成情况"
         width="120">
         <template #default="scope">
           <span>{{scope.row.isFinishProgress}}</span>
         </template>
       </el-table-column>
       <el-table-column
-        property="annualReport"
+        property="dean"
+        label="系主任"
+        width="120">
+      </el-table-column>
+      <el-table-column
+        property="aRSubmittedNum"
         label="年度报告"
         width="120">
       </el-table-column>
-      <el-table-column label="操作（待弄）">
-        <template #default="scope">
-          <el-button
-            size="mini"
-            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-        </template>
+    </el-table>
+
+    <el-table
+      v-else
+      id="out-table"
+      ref="singleTable"
+      :data="evaluationProgressData"
+      highlight-current-row
+      @current-change="handleCurrentChange"
+      style="width: 100%">
+      <el-table-column
+        type="index"
+        width="50">
+      </el-table-column>
+      <el-table-column
+        property="jobid"
+        label="教师工号"
+        width="120">
+      </el-table-column>
+      <el-table-column
+        property="name"
+        label="姓名"
+        width="120">
+      </el-table-column>
+      <el-table-column
+        property="role"
+        label="角色"
+        width="120">
+      </el-table-column>
+      <el-table-column
+        property="college"
+        label="单位"
+        width="120">
+      </el-table-column>
+      <el-table-column
+        property="dept"
+        label="系"
+        width="120">
+      </el-table-column>
+      <el-table-column
+        property="dean"
+        label="系主任"
+        width="120">
+      </el-table-column>
+      <el-table-column
+        property="aRSubmittedNum"
+        label="年度报告"
+        width="120">
       </el-table-column>
     </el-table>
-    <div style="margin-top: 20px">
-      <el-button @click="setCurrent(evaluationProgressData[1])">选中第二行</el-button>
-      <el-button @click="setCurrent()">取消选择</el-button>
-    </div>
 
     <div class="block">
       <el-pagination
@@ -220,20 +260,20 @@ export default defineComponent ({
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(res => {
-        console.log('request success!')
-        console.log(res)
+        // console.log('request success!')
+        // console.log(res)
         if(!res) {
           this.alertRequestFail()
           return
         }
         this.selectRangeOptions = res.selectRangeOptions
-        let {ep, deansofficeQueryableEP} = res
+        let {ep, arp, deansofficeQueryableEP} = res
         // ↓即使搜索结果为空，ep会返回{count:0, rows:[]}
-        this.evaluationProgressTotal = ep.count
-        this.evaluationProgressData = ep.rows
+        this.evaluationProgressTotal = ep ? ep.count : arp.count
+        this.evaluationProgressData = ep ? ep.rows : arp.rows
         let progress
         let isFinishProgress  // 设置评估进度完成情况
-        if(ep.rows) {
+        if(ep && ep.rows) {
           for(let i of this.evaluationProgressData) {
             let submittedNum = parseInt(i.submittedNum)
             let taskCount = parseInt(i.taskCount)
@@ -258,9 +298,9 @@ export default defineComponent ({
           }
         }
         if(deansofficeQueryableEP) {
-          let {notFinishedCount, range, teacherTotal} = deansofficeQueryableEP
-          if((notFinishedCount || notFinishedCount == 0) && range && (teacherTotal || teacherTotal == 0)) {   // if(0)不执行
-            this.deansofficeQueryableEP = `${range} 范围内，未完成听课工作人数： ${notFinishedCount} / ${teacherTotal}`
+          let {finishedCount, range, teacherTotal} = deansofficeQueryableEP
+          if((finishedCount || finishedCount == 0) && range && (teacherTotal || teacherTotal == 0)) {   // if(0)不执行
+            this.deansofficeQueryableEP = `${range} 范围内，完成听课工作人数： ${finishedCount} / ${teacherTotal}`
           }else {
             this.deansofficeQueryableEP = deansofficeQueryableEP
           }
@@ -278,6 +318,7 @@ export default defineComponent ({
 
     // 点击搜索按钮
     search() {
+      this.currentPage = 1
       this.requestEvaluationProgress()
     },
 
@@ -311,38 +352,50 @@ export default defineComponent ({
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(res => {
-        console.log('export request success!')
-        console.log(res)
-        let ep = res
+        // console.log('export request success!')
+        // console.log(res)
+        let {ep, arp} = res
         let progress
         let isFinishProgress  // 设置评估进度完成情况
-        for(let i of ep) {
-          let submittedNum = parseInt(i.submittedNum)
-          let taskCount = parseInt(i.taskCount)
-          if(i.role === '教师') {
-            progress = `${i.submittedNum} / ${i.taskCount} (${i.beEvaluatedNum} / 1)`
-            let beEvaluatedNum = parseInt(i.beEvaluatedNum)
-            if(submittedNum >= taskCount && beEvaluatedNum >= 1) {
-              isFinishProgress = '已完成'
+        let excelHeader
+        let excelFilterVal
+        let excelList
+        if(ep) {
+          excelHeader = ['教师工号', '姓名', '角色', '单位', '系', '评估进度(被听课进度)', '评估完成情况', '系主任', '年度报告']
+          excelFilterVal = ['jobid', 'name', 'role', 'college', 'dept', 'progress', 'isFinishProgress', 'dean', 'aRSubmittedNum']
+          excelList = ep
+          for(let i of ep) {
+            let submittedNum = parseInt(i.submittedNum)
+            let taskCount = parseInt(i.taskCount)
+            if(i.role === '教师') {
+              progress = `${i.submittedNum} / ${i.taskCount} (${i.beEvaluatedNum} / 1)`
+              let beEvaluatedNum = parseInt(i.beEvaluatedNum)
+              if(submittedNum >= taskCount && beEvaluatedNum >= 1) {
+                isFinishProgress = '已完成'
+              }else {
+                isFinishProgress = '未完成'
+              }
             }else {
-              isFinishProgress = '未完成'
+              progress = `${i.submittedNum} / ${i.taskCount}`
+              if(submittedNum >= taskCount) {
+                isFinishProgress = '已完成'
+              }else {
+                isFinishProgress = '未完成'
+              }
             }
-          }else {
-            progress = `${i.submittedNum} / ${i.taskCount}`
-            if(submittedNum >= taskCount) {
-              isFinishProgress = '已完成'
-            }else {
-              isFinishProgress = '未完成'
-            }
+            i.progress = progress
+            i.isFinishProgress = isFinishProgress
           }
-          i.progress = progress
-          i.isFinishProgress = isFinishProgress
+        }else if(arp) {
+          excelHeader = ['教师工号', '姓名', '角色', '单位', '系', '系主任', '年度报告']
+          excelFilterVal = ['jobid', 'name', 'role', 'college', 'dept', 'dean', 'aRSubmittedNum']
+          excelList = arp
         }
         require.ensure([], () => {
           const {export_json_to_excel} = require('@/vendor/Export2Excel')
-          const tHeader = ['教师工号', '姓名', '角色', '单位', '系', '评估进度(被听课进度)', '评估完成情况', '年度报告']
-          const filterVal = ['jobid', 'name', 'role', 'college', 'dept', 'progress', 'isFinishProgress', 'annualReport']
-          const list = ep
+          const tHeader = excelHeader
+          const filterVal = excelFilterVal
+          const list = excelList
           const data = this.formatJson(filterVal, list)
           export_json_to_excel(tHeader, data, 'evaluationProgressExcel')
         })

@@ -120,7 +120,13 @@ export default defineComponent ({
           lecturerRectification, lecturer, lecturerTime, 
           followUpUnitSuggestion, followUpUnit, followUpUnitTime
       } = this.evaluationSheet
-      
+      let date = class_time.split(' ')[0]
+      let time = class_time.split(' ')[1]
+      let class_time_year = date.split('-')[0]
+      let class_time_month = date.split('-')[1]
+      let class_time_day = date.split('-')[2]
+      let class_time_startTime = time.split('-')[0]
+      let class_time_endTime = time.split('-')[1]
       let roleType 
       switch (role) {
         case '教师':
@@ -200,7 +206,7 @@ export default defineComponent ({
       
       this.wordData = {
         submitter_id,
-        course_setupUnit, course_name, class_id, teacher_name, class_time, place, attend_num, actual_num, role,
+        course_setupUnit, course_name, class_id, teacher_name, class_time_year, class_time_month, class_time_day, class_time_startTime, class_time_endTime, place, attend_num, actual_num, role,
         environment,
         // evaluationList,
         appreciateMethod, concreteSuggestion, familiarity, extension, followUp, otherSuggestion, submitter, submit_time,

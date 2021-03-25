@@ -16,6 +16,17 @@
   <router-view/>
 </template>
 
+<script>
+export default {
+  // mounted() {
+  //   window.addEventListener('beforeunload', e => {
+  //     localStorage.removeItem('token')
+  //     localStorage.removeItem('tokenCode')
+  //   })
+  // },
+}
+</script>
+
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
